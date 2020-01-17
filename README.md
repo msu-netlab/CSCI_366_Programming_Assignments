@@ -11,27 +11,28 @@ Submit your work on D2L into the "Programming Assignment 1" folder.
 
 In this programming assignment you will:
 
-- Learn how to build a C++ project using CMake
-- Learn how to test your code using googletest
-- Learn how to work with github 
+- clone and commit to [GitHub](https://github.com/) repositories
+- Learn how to build a C++ project using [CMake](https://cmake.org/)
+- Learn how to test your code using [googletest](https://github.com/google/googletest)
 
 
 ## Overview
 
-In this programming assignment you will build a basic implementation of the 
+Your objective is to implement a basic version of the 
 [Battleship](https://en.wikipedia.org/wiki/Battleship_\(game\)) 
 game.
 You will use the standard 
 [10x10 variation of the game](https://en.wikipedia.org/wiki/Battleship_\(game\)#Description)
 .
-Here is an 
+Here is an example of 
 [online implementation](http://www.battleshiponline.org/) 
-of the Battleship game.
+of the game.
 *Note that the ships in that implementation have slightly different names.*
 
 Your implementation will be a client server architecture.
-This repository provides you with the header files for the `Client` and `Server` implementations, client and server 
-run times, and a testing suite.
+This repository provides you with the header files for the client (player) and server implementations (`src/Client.hpp` 
+and `src/Server.hpp`), client and server run times (`src/client_main.cpp` and `src/server_main.cpp`), and a suite of 
+tests (`test/tests.cpp`).
 Your job is to finish the implementation of `Client.cpp` and `Server.cpp` to pass all the tests in `tests.cpp`.
 
 
@@ -60,6 +61,7 @@ __________
 Save these boards for both players as `player_1.setup_board.txt` and `player_2.setup_board
 .txt`.
 
+
 ## Messages
 
 To play the game, your implementation needs to exchange two types of messages - `shot` and `result`.
@@ -82,27 +84,32 @@ The player reads the result file and updates the result on its action board `pla
 
 To play Battleship you should first start the server by running the `run-server` executable.
 Then start the player clients by running two instances of the `run-client` executable.
+Unfortunately, the client and server executables will not do anything interesting until you implement `Client.cpp` 
+and `Server.cpp`.
+As you progress in these implementations, your code will pass more and more tests in `tests.cpp`.
+When your code passes all the tests, you will be able to run the client and server executables to play the game.
 
-To test the functions of your implementation run the `battleship_tests` executable.
 
-
-## BONUS
+## Bonus 
 
 I will award __one bonus point__ for each of the following:  
 
 * Server throws an error if both players start with the same player number. (implementations and tests)
 
-* Server sends a different result when a ship is sunk. (implementation and tests)
+* Server sends a different result when a ship is sunk. The client implementation notifies the player when they sink a
+ ship (implementation and tests)
 
-* Server detects when a game ends and returns the winner to both players. Players display the winner. (implementation
- and tests)
+* Server detects when a game ends and returns the winner to both players. Player clients display the winner. 
+(implementation and tests)
 
 
 ## What to Submit
 
-* A text file containing a link to a github repository with your solution
+Submit your work on D2L into the "Programming Assignment 1" folder. 
 
-* A text file alerting the TA if you implemented any of the bonus features
+* A text file containing a link to a GitHub repository with your solution
+
+* A text file alerting the TA if you implemented any of the bonus features, and if so, which ones
 
 
 ## Grading 
