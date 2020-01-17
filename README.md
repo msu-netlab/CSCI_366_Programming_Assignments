@@ -6,6 +6,9 @@
 Complete the following assignment individually.
 Submit your work on D2L into the "Programming Assignment 1" folder. 
 
+For a deeper discussion of the assignment and the code, please check out this 
+[YouTube video](https://www.youtube.com/watch?v=pbCY2e1oFys).
+
 
 ## Learning Objectives
 
@@ -74,6 +77,11 @@ right and down.
 
 
 ## Program Operation
+
+The following figure illustrates the operation of the program.
+(I kept the image from the lecture for continuity.)
+
+![system architecture](images/system_architecture.png)
 
 The player fires a `shot` by writing coordinates to a `player_#.shot.json` file.
 The server reads the shot file, determines the result of the shot, and writes it into `player_#.result.json`.
