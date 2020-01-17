@@ -1,0 +1,13 @@
+#copy the board files into runtime directory
+configure_file(${PROJECT_SOURCE_DIR}/player_1.setup_board.txt ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/player_1.setup_board.txt COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/player_2.setup_board.txt ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/player_2.setup_board.txt COPYONLY)
+
+include_directories(${PROJECT_SOURCE_DIR}/cereal/include)
+
+add_library(SERVER Server.cpp Server.hpp)
+
+add_library(CLIENT Client.cpp Client.hpp)
+
+add_executable(run_server server_main.cpp Server.cpp)
+
+add_executable(run_client client_main.cpp Client.cpp)
