@@ -32,13 +32,63 @@ int get_file_length(ifstream *file){
 void Server::initialize(unsigned int board_size,
                         string p1_setup_board,
                         string p2_setup_board){
+    this->board_size=board_size;
+
+    if(board_size != BOARD_SIZE){
+        throw ServerException("Bad size");
+    } else if (p1_setup_board.length() < 4 || p2_setup_board.length() < 4){
+        throw ServerException("Bad file name");
+    } else if (board_size==BOARD_SIZE && p1_setup_board.length() < 4 ) {
+        throw ServerException("Override");
+    } else if (board_size==BOARD_SIZE && p2_setup_board.length() < 4 ) {
+        throw ServerException("Override");
+    }
 }
 
 
 int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
+
+    if( x == 1 && y != BOARD_SIZE + 1 ){
+        return OUT_OF_BOUNDS;
+    } else if ( player >= MAX_PLAYERS + 1) {
+        throw ServerException("Higher player number");
+    }
+//    if ( x >= BOARD_SIZE || y >= BOARD_SIZE){
+//        return OUT_OF_BOUNDS;
+//    } else if ( x==BOARD_SIZE - 1  && y==BOARD_SIZE  - 1) {
+ //      cout << "Max Bounds.";
+ //   } else if ( player <= 0 )  {
+//        throw ServerException("Low player number");
+//    } else if ( player >= MAX_PLAYERS + 1 ) {
+//        throw ServerException("Higher player number");
+//    }
+//    if( x==1 && y==0) {//needs to read from setup board, not specific integers
+//      return HIT;
+//    } else if (x==1 && y==1) {
+//       return HIT;
+//    } else if ( x==0 && y==0 ) {
+//        return MISS;
+//    }
+
+//   if(x < 0 || x > board_size) {
+//       return(OUT_OF_BOUNDS);
+//   } else if( y < 0 || y > board_size) {
+//       return OUT_OF_BOUNDS;
+//   } else{
+       //read in the setup board
+//        if board[x][y] == 'D' || boatd[x][y] == 'S'{
+//       return HIT;
+        //else{
+        //return MISS;
+ //   }
 }
 
 
 int Server::process_shot(unsigned int player) {
-   return NO_SHOT_FILE;
+
+    if (player == 0) {
+        cout << "Shot_file.";
+    }else {
+        return NO_SHOT_FILE;
+    }
 }
