@@ -22,6 +22,6 @@
 #define MISS -1
 #define OUT_OF_BOUNDS 0
 
-#define BOARD_SIZE 2
+#define BOARD_SIZE 10
 
 #endif //BATTLESHIP_COMMON_H

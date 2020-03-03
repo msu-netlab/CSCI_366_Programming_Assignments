@@ -29,26 +29,29 @@
 
 
 /**
- * Compute the diff distance between a string and the contents of the file using the dtl library
- * @param str - string to be compared
- * @param fname - against the contents of the file
- * @return distance between s and contents of f
+ * Compute the diff distance between two files using the dtl library
+ * @param file1 - name of the first file
+ * @param file2 - name of the second file
+ * @return distance between the contents of two files
  */
 #include <dtl.hpp> // a library for diffing strings
-long get_diff_dist(string str, string fname){
-    // load the file contents
-    ifstream file(fname);
-    string fctnt((std::istreambuf_iterator<char>(file)),
-                    std::istreambuf_iterator<char>());
+long get_diff_dist(string file1, string file2){
+   // load the file contents
+   ifstream ifstr1(file1);
+   string file1_S((std::istreambuf_iterator<char>(ifstr1)),
+                  std::istreambuf_iterator<char>());
+   ifstr1.close();
+   ifstream ifstr2(file2);
+   string file2_S((std::istreambuf_iterator<char>(ifstr2)),
+                  std::istreambuf_iterator<char>());
+   ifstr2.close();
 
-    // compute the distance between correct and constructed boards
-    dtl::Diff<char, string> d(str, fctnt);
-    d.onOnlyEditDistance();
-    d.compose();
+   // compute the distance between correct and constructed boards
+   dtl::Diff<char, string> d(file1_S, file2_S);
+   d.onOnlyEditDistance();
+   d.compose();
 
-    // clean up and return
-    file.close();
-    return d.getEditDistance();
+   return d.getEditDistance();
 }
 
 
@@ -63,7 +66,7 @@ TEST_F(ServerInitialize, Correct_Board_Size){
 }
 
 TEST_F(ServerInitialize, Wrong_Board_Size){
-    ASSERT_ANY_THROW(srv.initialize(0, "player_1.setup_board.txt", "player_2.setup_board.txt"));
+    ASSERT_ANY_THROW(srv.initialize(BOARD_SIZE-1, "player_1.setup_board.txt", "player_2.setup_board.txt"));
 }
 
 TEST_F(ServerInitialize, Bad_File_Name){
@@ -80,30 +83,30 @@ protected:
 };
 
 TEST_F(ServerEvaluateShot, Hit_Detected){
-    ASSERT_EQ(HIT, srv.evaluate_shot(2,1,0));
+    ASSERT_EQ(HIT, srv.evaluate_shot(1,9,0));
 }
 
 TEST_F(ServerEvaluateShot, Miss_Detected){
-    ASSERT_EQ(MISS, srv.evaluate_shot(2,0,0));
+    ASSERT_EQ(MISS, srv.evaluate_shot(1,9,1));
 }
 
 TEST_F(ServerEvaluateShot, Out_Of_Bounds_X){
-    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(2,srv.board_size+1,1));
+    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,srv.board_size+1,1));
 }
 
 TEST_F(ServerEvaluateShot, Out_Of_Bounds_Y){
-    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(2,1,srv.board_size+1));
+    ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,1,srv.board_size+1));
 }
 
 TEST_F(ServerEvaluateShot, Max_In_Bounds){
-    ASSERT_NO_THROW(srv.evaluate_shot(2,srv.board_size-1,srv.board_size-1));
+    ASSERT_NO_THROW(srv.evaluate_shot(1,srv.board_size-1,srv.board_size-1));
 }
 
 TEST_F(ServerEvaluateShot, Bad_Player_Number_Low){
     ASSERT_ANY_THROW(srv.evaluate_shot(0,0,0));
 }
 
-TEST_F(ServerEvaluateShot, Bad_Player_Number_Low_High){
+TEST_F(ServerEvaluateShot, Bad_Player_Number_High){
     ASSERT_ANY_THROW(srv.evaluate_shot(MAX_PLAYERS+1,0,0));
 }
 
@@ -131,47 +134,27 @@ protected:
 
 
 TEST_F(ServerProcessShot, Hit_Detected){
-    set_up_shot(1, 1);
+    set_up_shot(0, 1);
     srv.process_shot(1);
-
-    string correct_result = "{\n"
-                            "    \"result\": "+to_string(HIT)+"\n"
-                            "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_result, "player_1.result.json"));
+    ASSERT_EQ(0, get_diff_dist("correct_hit_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Miss_Detected){
-    set_up_shot(0, 0);
+    set_up_shot(1, 1);
     srv.process_shot(1);
-
-    string correct_result = "{\n"
-                            "    \"result\": "+to_string(MISS)+"\n"
-                            "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_result, "player_1.result.json"));
+    ASSERT_EQ(0, get_diff_dist("correct_miss_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_X){
     set_up_shot(srv.board_size, 0);
     srv.process_shot(1);
-
-    string correct_result = "{\n"
-                            "    \"result\": "+to_string(OUT_OF_BOUNDS)+"\n"
-                                                               "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_result, "player_1.result.json"));
+    ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Out_Of_Bounds_Y){
     set_up_shot(0, srv.board_size);
     srv.process_shot(1);
-
-    string correct_result = "{\n"
-                            "    \"result\": "+to_string(OUT_OF_BOUNDS)+"\n"
-                                                               "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_result, "player_1.result.json"));
+    ASSERT_EQ(0, get_diff_dist("correct_out_of_bounds_result.json", "player_1.result.json"));
 }
 
 TEST_F(ServerProcessShot, Max_In_Bounds){
@@ -211,20 +194,7 @@ protected:
 };
 
 TEST_F(ClientInitialize, Creates_Action_Board){
-    string correct_board = "{\n"
-                           "    \"board\": [\n"
-                           "        [\n"
-                           "            0,\n"
-                           "            0\n"
-                           "        ],\n"
-                           "        [\n"
-                           "            0,\n"
-                           "            0\n"
-                           "        ]\n"
-                           "    ]\n"
-                           "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_board, "player_1.action_board.json"));
+    ASSERT_EQ(0, get_diff_dist("player_1.action_board.json", "correct_start_action_board.json"));
 }
 
 
@@ -242,14 +212,8 @@ protected:
 };
 
 TEST_F(ClientFire, Creates_Fire_Message){
-    client.fire(1,1);
-
-    string correct_shot = "{\n"
-                          "    \"x\": 1,\n"
-                          "    \"y\": 1\n"
-                          "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_shot, "player_1.shot.json"));
+    client.fire(0,1);
+    ASSERT_EQ(0, get_diff_dist("player_1.shot.json", "correct_fire_message.json"));
 }
 
 
@@ -350,40 +314,13 @@ protected:
 
 TEST_F(ClientUpdateActionBoard, Record_Hit){
     client.update_action_board(HIT, 0, 0);
-
-    string correct_board = "{\n"
-                           "    \"board\": [\n"
-                           "        [\n"
-                           "            1,\n"
-                           "            0\n"
-                           "        ],\n"
-                           "        [\n"
-                           "            0,\n"
-                           "            0\n"
-                           "        ]\n"
-                           "    ]\n"
-                           "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_board, "player_1.action_board.json"));
+    ASSERT_EQ(0, get_diff_dist("player_1.action_board.json", "correct_hit_action_board.json"));
 }
 
 TEST_F(ClientUpdateActionBoard, Record_Miss){
     client.update_action_board(MISS, 0, 0);
 
-    string correct_board = "{\n"
-                           "    \"board\": [\n"
-                           "        [\n"
-                           "            -1,\n"
-                           "            0\n"
-                           "        ],\n"
-                           "        [\n"
-                           "            0,\n"
-                           "            0\n"
-                           "        ]\n"
-                           "    ]\n"
-                           "}";
-
-    ASSERT_EQ(0, get_diff_dist(correct_board, "player_1.action_board.json"));
+    ASSERT_EQ(0, get_diff_dist("player_1.action_board.json", "correct_miss_action_board.json"));
 }
 
 
