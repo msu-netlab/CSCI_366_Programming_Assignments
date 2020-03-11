@@ -308,7 +308,7 @@ protected:
     }
 
     void TearDown() override{
-        remove("player_1.action_board.json");
+       remove("player_1.action_board.json");
     }
 };
 
