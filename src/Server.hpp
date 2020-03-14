@@ -55,7 +55,7 @@ public:
 
 class Server{
 public:
-   int board_size;
+   int board_size = BOARD_SIZE;
 
 private:
    ifstream p1_setup_board;
@@ -74,7 +74,7 @@ public:
     * @param p2_setup_board - file name of player 2's board
     */
    void initialize(unsigned int board_size,
-                   string p1_setup_board,
+                   const char *p1_setup_board,
                    string p2_setup_board);
 
    /**
