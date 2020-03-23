@@ -55,6 +55,95 @@ long get_diff_dist(string file1, string file2){
 }
 
 
+TEST(BitArray2DCreate, Correct_1by1){
+   BitArray2D *array;
+   ASSERT_NO_THROW(array = new BitArray2D(1,1));
+}
+
+TEST(BitArray2DCreate, Correct_10by10){
+   BitArray2D *array;
+   ASSERT_NO_THROW(array = new BitArray2D(10,10));
+}
+
+TEST(BitArray2DCreate, Incorrect){
+   BitArray2D *array;
+   ASSERT_ANY_THROW(array = new BitArray2D(0,0));
+}
+
+
+
+
+class BitArray2DSetGet : public ::testing::Test{
+protected:
+   BitArray2D *array;
+
+   void SetUp() override {
+      array = new BitArray2D(10, 10);
+   };
+
+   void TearDown() override{
+      delete array;
+   }
+
+};
+
+TEST_F(BitArray2DSetGet, Zero){
+   int row=0, col=0;
+   array->set(row, col);
+   ASSERT_EQ(1, array->get(row,col));
+}
+
+TEST_F(BitArray2DSetGet, One){
+   int row=0, col=1;
+   array->set(row, col);
+   ASSERT_EQ(1, array->get(row,col));
+}
+
+TEST_F(BitArray2DSetGet, Seven){
+   int row=0, col=7;
+   array->set(row, col);
+   ASSERT_EQ(1, array->get(row,col));
+}
+
+TEST_F(BitArray2DSetGet, Eight){
+   int row=0, col=8;
+   array->set(row, col);
+   ASSERT_EQ(1, array->get(row,col));
+}
+
+TEST_F(BitArray2DSetGet, Nine){
+   int row=0, col=9;
+   array->set(row, col);
+   ASSERT_EQ(1, array->get(row,col));
+}
+
+TEST_F(BitArray2DSetGet, Ten){
+   int row=9, col=1;
+   array->set(row, col);
+   ASSERT_EQ(1, array->get(row,col));
+}
+
+TEST_F(BitArray2DSetGet, Hundred){
+   int row=9, col=9;
+   array->set(row, col);
+   ASSERT_EQ(1, array->get(row,col));
+}
+
+TEST_F(BitArray2DSetGet, Get_Out_Of_Bounds_High){
+   ASSERT_ANY_THROW(array->get(BOARD_SIZE, BOARD_SIZE));
+}
+
+TEST_F(BitArray2DSetGet, Get_Out_Of_Bounds_Low){
+   ASSERT_ANY_THROW(array->get(-1, -1));
+}
+
+TEST_F(BitArray2DSetGet, Set_Out_Of_Bounds_High){
+   ASSERT_ANY_THROW(array->set(BOARD_SIZE, BOARD_SIZE));
+}
+
+TEST_F(BitArray2DSetGet, Set_Out_Of_Bounds_Low){
+   ASSERT_ANY_THROW(array->set(-1, -1));
+}
 
 class ServerInitialize : public ::testing::Test{
 protected:
@@ -90,12 +179,20 @@ TEST_F(ServerEvaluateShot, Miss_Detected){
     ASSERT_EQ(MISS, srv.evaluate_shot(1,9,1));
 }
 
-TEST_F(ServerEvaluateShot, Out_Of_Bounds_X){
+TEST_F(ServerEvaluateShot, Out_Of_Bounds_X_High){
     ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,srv.board_size+1,1));
 }
 
-TEST_F(ServerEvaluateShot, Out_Of_Bounds_Y){
+TEST_F(ServerEvaluateShot, Out_Of_Bounds_X_Low){
+   ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,-1,1));
+}
+
+TEST_F(ServerEvaluateShot, Out_Of_Bounds_Y_High){
     ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,1,srv.board_size+1));
+}
+
+TEST_F(ServerEvaluateShot, Out_Of_Bounds_Y_Low){
+   ASSERT_EQ(OUT_OF_BOUNDS, srv.evaluate_shot(1,1,-1));
 }
 
 TEST_F(ServerEvaluateShot, Max_In_Bounds){

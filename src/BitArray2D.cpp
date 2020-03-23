@@ -14,38 +14,31 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <math.h>
+#include "BitArray2D.hpp"
 
-#include "common.hpp"
-#include "Server.hpp"
+BitArray2D::BitArray2D(unsigned int rows, unsigned int columns) {
 
-
-/**
- * Calculate the length of a file (helper function)
- *
- * @param file - the file whose length we want to query
- * @return length of the file in bytes
- */
-int get_file_length(ifstream *file){
 }
 
 
-void Server::initialize(unsigned int board_size,
-                        string p1_setup_board,
-                        string p2_setup_board){
+BitArray2D::~BitArray2D() {
+
 }
 
 
-Server::~Server() {
+bool BitArray2D::get(unsigned int row, unsigned int column){
+   // set array bounds
+
+   // get the element
+   return get_bit_elem(array, columns, row, column);
 }
 
 
-BitArray2D *Server::scan_setup_board(string setup_board_name){
-}
 
-int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
-}
+void BitArray2D::set(unsigned int row, unsigned int column){
+   // check array bounds
 
-
-int Server::process_shot(unsigned int player) {
-   return NO_SHOT_FILE;
+   // set the element
+   set_bit_elem(array, columns, row, column);
 }

@@ -24,6 +24,8 @@
 
 #include <cereal/archives/json.hpp>
 
+#include "BitArray2D.hpp"
+
 #define SHOT_FILE_PROCESSED 0
 #define NO_SHOT_FILE 1
 
@@ -55,11 +57,19 @@ public:
 
 class Server{
 public:
-   int board_size;
+   unsigned int board_size;
 
 private:
-   ifstream p1_setup_board;
-   ifstream p2_setup_board;
+
+   BitArray2D *p1_setup_board = nullptr;
+   BitArray2D *p2_setup_board = nullptr;
+
+   /**
+    * Sets up a BitArray2D pointer with bits filled in based on a setup_board_name
+    * @param setup_board_name - the name of the setup board file
+    * @return an internally allocated pointer to a BitArray2D object
+    */
+   BitArray2D *scan_setup_board(string setup_board_name);
 
 public:
    /**
@@ -98,4 +108,9 @@ public:
     * @return returns SHOT_PROCESSED, or NO_SHOT_FILE if nothing to process
     */
    int process_shot(unsigned int player);
+
+   /**
+    * Deallocates Server memory
+    */
+   ~Server();
 };
