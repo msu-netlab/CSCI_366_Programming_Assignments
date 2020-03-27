@@ -60,7 +60,12 @@ I will award __one bonus point__ for each of the following:
 
 Submit your work on D2L into the "Programming Assignment 2" folder. 
 
-* A text file containing a link to a GitHub repository with your solution for the base assignment
+* A text file containing a link to a GitHub repository with your solution for the base assignment.
+Please not that your repository should be private, so that other students cannot see your solutions.
+You can create an unlimited number of private repositories by upgrading your github account to the pro version for
+ free using the [academic discount](https://help.github.com/en/github/teaching-and-learning-with-github-education/applying-for-an-educator-or-researcher-discount) with your school email.
+In order for us to be able to see your solution, please add github users `cooperstrahan` and `mwittie` as
+ collaborators through repository settings.
 
 * If you implement the bonus solution, please submit a YouTube video of your implementation. 
 Be sure to show the tests you have written as well as your assembly code.
