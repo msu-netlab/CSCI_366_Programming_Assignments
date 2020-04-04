@@ -95,7 +95,7 @@ int Client::get_result() {
 void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 
     vector<vector<int>> actVector;
-    fstream actfile("player_1.action_board.json");
+    ifstream actfile("player_1.action_board.json");
     cereal::JSONInputArchive inarchive(actfile);
     inarchive(actVector);
     actVector[x][y] = result;
@@ -108,4 +108,19 @@ void Client::update_action_board(int result, unsigned int x, unsigned int y) {
 
 
 string Client::render_action_board(){
+
+    vector<vector<int>> actVector;
+    ifstream actfile("player_1.action_board.json");
+    cereal::JSONInputArchive inarchive(actfile);
+    inarchive(actVector);
+    printf("\n\nhello\n\n");
+    int result;
+    for(int i=0; i<10; i++) {
+        for (int j=0; j<10; j++) {
+            result = actVector[i][j];
+            cout << result;
+        }
+
+    }
+
 }
