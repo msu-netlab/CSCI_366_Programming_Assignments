@@ -14,6 +14,6 @@ add_library(SERVER Server.cpp Server.hpp BitArray2D.cpp BitArray2D.hpp BitArray2
 
 add_library(CLIENT Client.cpp Client.hpp)
 
-add_executable(run_server server_main.cpp Server.cpp)
+add_executable(run_server server_main.cpp Server.cpp BitArray2D.cpp BitArray2D.hpp BitArray2D.asm)
 
-add_executable(run_client client_main.cpp Client.cpp)
+add_executable(run_client client_main.cpp Client.cpp BitArray2D.cpp BitArray2D.hpp BitArray2D.asm)
