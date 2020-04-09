@@ -28,7 +28,7 @@ BitArray2D::~BitArray2D() {
 
 
 bool BitArray2D::get(unsigned int row, unsigned int column){
-   // set array bounds
+   // check array bounds
 
    // get the element
    return get_bit_elem(array, columns, row, column);
