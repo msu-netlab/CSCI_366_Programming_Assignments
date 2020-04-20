@@ -26,7 +26,6 @@ int main(){
 
     Server s;
     s.initialize(BOARD_SIZE, "player_1.setup_board.txt", "player_2.setup_board.txt");
-
     // run the server process in a loop
     while(true){
         while(s.process_shot(1) == NO_SHOT_FILE) {
