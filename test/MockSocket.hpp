@@ -14,37 +14,21 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "common.hpp"
-#include "Client.hpp"
-
-#include <cstdio>
-#include <string>
+#ifndef BATTLESHIP_MOCKSOCKET_HPP
+#define BATTLESHIP_MOCKSOCKET_HPP
 
 
-Client::~Client() {
-}
+#include "gmock/gmock.h"
 
+#include "Socket.hpp"
 
-void Client::initialize(unsigned int player, ConnectionSocket *socket, unsigned int board_size){
-}
+class MockConnectionSocket : public ConnectionSocket {
+public:
+   MockConnectionSocket(unsigned int socket) : ConnectionSocket(socket) {};
 
+   MOCK_METHOD(void, send, (string msg), (override));
+   MOCK_METHOD(bool, data_available, (), (override));
+   MOCK_METHOD(istringstream *, receive, (), (override));
+};
 
-void Client::fire(unsigned int x, unsigned int y) {
-}
-
-
-bool Client::result_available() {
-}
-
-
-int Client::get_result() {
-}
-
-
-
-void Client::update_action_board(int result, unsigned int x, unsigned int y) {
-}
-
-
-string Client::render_action_board(){
-}
+#endif //BATTLESHIP_MOCKSOCKET_HPP

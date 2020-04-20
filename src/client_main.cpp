@@ -17,54 +17,67 @@
 
 #include "common.hpp"
 #include "Client.hpp"
+#include "Socket.hpp"
 
-#include <chrono>
-#include <thread>
+#include <cstdio>
+#include <unistd.h>
+#include <string>
 
-int main()
+#define SERVER_ADDRESS "127.0.0.1"
+
+
+
+int main(int argc, char *argv[])
 {
-    printf("Starting Battleship client\n");
+   printf("Battleship client\n");
 
-    // initialize the client with a correct player number
-    Client c;
-    while(! c.initialized){
-        try{
-            cout << "Enter player number: ";
-            int player;
-            cin >> player;
-            c.initialize(player, BOARD_SIZE);
-        } catch (ClientWrongPlayerNumberException& e){
-            cout << e.what() << '\n';
-        }
+   // get player number from the command line
+   int opt, player;
+   while((opt = getopt(argc, argv, "p:")) != -1){
+      switch(opt){
+         case 'p':
+            player = std::stoi(optarg);
+            printf("Starting as player %d\n", player);
+            break;
+         case '?':
+            printf("unknown option: %c\n", optopt);
+            break;
+      }
+   }
 
-    }
+   // connect to server
+   ConnectionSocket socket(SERVER_ADDRESS, SERVER_PORT);
 
-    // keep firing and updating the action board with results from the server
-    unsigned int x, y;
-    while(true){
-        // get coordinates
-        cout << "Enter fire x position: ";
-        cin >> x;
-        cout << "Enter fire y position: ";
-        cin >> y;
+   // initialize the client
+   Client c;
+   c.initialize(player, &socket, BOARD_SIZE);
 
-        // fire and get result
-        c.fire(x, y);
-        while(! c.result_available()) {
-            cout << "Waiting for result" << endl;
-            this_thread::sleep_for(std::chrono::milliseconds(2000));
-        }
-        int result = c.get_result();
-        printf("Shot at (%d, %d) result %d\n", x, y, result);
-        if(result == OUT_OF_BOUNDS){
-            cout << "Entered coordinates are out of bounds" << "\n";
-            continue;
-        }
 
-        // update the action board
-        c.update_action_board(result, x, y);
-        cout << c.render_action_board();
-    }
+   // keep firing and updating the action board with results from the server
+   unsigned int x, y;
+   while(true){
+      // get coordinates
+      cout << "Enter fire x position: ";
+      cin >> x;
+      cout << "Enter fire y position: ";
+      cin >> y;
 
-    return 0;
+      // fire and get result
+      c.fire(x, y);
+      while(! c.result_available()) {
+         cout << "Waiting for result" << endl;
+      }
+      int result = c.get_result();
+      printf("Shot at (%d, %d) result %d\n", x, y, result);
+      if(result == OUT_OF_BOUNDS){
+         cout << "Entered coordinates are out of bounds" << "\n";
+         continue;
+      }
+
+      // update the action board
+      c.update_action_board(result, x, y);
+      cout << c.render_action_board();
+   }
+
+   return 0;
 }

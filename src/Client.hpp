@@ -14,96 +14,107 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "Socket.hpp"
 #include <iostream>
 #include <fstream>
 #include <cereal/archives/json.hpp>
 #include <cereal/types/vector.hpp>
 
+
 using namespace std;
 
 class ClientWrongPlayerNumberException: public exception{
 public:
-    virtual const char* what() const throw(){
-        return "Player number our of bounds.";
-    }
+   virtual const char* what() const throw(){
+      return "Player number out of bounds.";
+   }
 };
 
 class ClientException: public exception
 {
 private:
-    char *cstr;
+   char *cstr;
 
 public:
-    ClientException(string message){
-        cstr = new char[message.size() + 1];
-        message.copy(cstr, message.size() + 1);
-        cstr[message.size()] = '\0';
-    }
+   ClientException(string message){
+      cstr = new char[message.size() + 1];
+      message.copy(cstr, message.size() + 1);
+      cstr[message.size()] = '\0';
+   }
 
-    ~ClientException(){
-        delete cstr;
-    }
+   ~ClientException(){
+      delete cstr;
+   }
 
-    virtual const char* what() const throw(){
-        return cstr;
-    }
+   virtual const char* what() const throw(){
+      return cstr;
+   }
 };
 
 class Client {
 private:
-    unsigned int player;
-    string board_name;
-public:
-    unsigned int board_size;
-    bool initialized = false;
+   unsigned int player; ///< the number of this player - either 1 or 2
+   string action_board; ///< the name of the action board file
+   ConnectionSocket *socket; ///< socket connected to the server
 
 public:
-    /**
-     * Destructor to remove the action board created in initialize()
-     */
-    ~Client();
+   unsigned int board_size; ///< the size of the game board
 
-    /**
-     * Performs the initialization functions that normally would be in a constructor, but needs to be a separate
-     * function for googletest so clients may be initialized in the SetUp() function.
-     * Creates player_#.action_board.json.
-     * @param player - the id of the player
-     * @param board_size - the square size of the action board
-     */
-    void initialize(unsigned int player, unsigned int board_size);
+public:
+   /**
+    * Destructor to remove the action board created in initialize()
+    */
+   ~Client();
 
-    /**
-     * Fires a shot on the coordinate target and creates a player_#.shot.json file
-     * @param x - coordinate
-     * @param y - coordinate
-     */
-    void fire(unsigned int x, unsigned int y);
+   /**
+    * Initialize the client
+    *
+    * Creates player_#.action_board.json to store results of player shots.
+    * @param player - the id of the player
+    * @param socket - socket connected to the server
+    * @param board_size - the square size of the action board
+    */
+   void initialize(unsigned int player, ConnectionSocket *socket, unsigned int board_size);
 
-    /**
-     * Checks if a result file is available for
-     * @return true if result is available, false otherwise
-     */
-    bool result_available();
 
-    /**
-     * Gets the result from the player_#.result.json
-     * @return the result as either HIT, MISS, or OUT_OF_BOUNDS
-     */
-    int get_result();
+   /**
+    * Fires a shot on the coordinate target
+    *
+    * Uses socket to send the coordinates to server
+    * @param x - coordinate
+    * @param y - coordinate
+    */
+   void fire(unsigned int x, unsigned int y);
 
-    /**
-     * Updates the internal representation of player_#.action_board.json on the result of a shot.
-     * @param result - the result returned from the server
-     * @param x - coordinate
-     * @param y - coordinate
-     */
-    void update_action_board(int result, unsigned int x, unsigned int y);
+   /**
+    * Checks if a result from the server is available in socket
+    *
+    * @return true if result is available, false otherwise
+    */
+   bool result_available();
 
-    /**
-     * Formats a string representing player_#.action_board.json as ASCII
-     * @return ASCII representation of the action board
-     */
-    string render_action_board();
+   /**
+    * Gets the result from socket
+    *
+    * @return the result as either HIT, MISS, or OUT_OF_BOUNDS
+    */
+   int get_result();
+
+   /**
+    * Updates the internal representation of player action board with the results of a shot.
+    *
+    * @param result - the result returned from the server
+    * @param x - coordinate
+    * @param y - coordinate
+    */
+   void update_action_board(int result, unsigned int x, unsigned int y);
+
+   /**
+    * Formats an ASCII string representing the action board
+    *
+    * @return ASCII representation of the action board
+    */
+   string render_action_board();
 
 };
 

@@ -14,6 +14,8 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "BitArray2D.hpp"
+#include "Socket.hpp"
 
 #include <stdio.h>
 #include <memory.h>
@@ -21,13 +23,8 @@
 #include <fstream>
 #include <exception>
 #include <cstdio>
-
+#include <semaphore.h>
 #include <cereal/archives/json.hpp>
-
-#include "BitArray2D.hpp"
-
-#define SHOT_FILE_PROCESSED 0
-#define NO_SHOT_FILE 1
 
 #define SHIPS "CBRSD" //Carrier, Battleship, cRuiser, Submarine, and Destroyer
 
@@ -55,14 +52,17 @@ public:
    }
 };
 
+
+
 class Server{
 public:
-   unsigned int board_size;
+   unsigned int board_size;   ///< the size of the game board files
 
 private:
+   BitArray2D *p1_setup_board = nullptr;  ///< internal representation of a player setup board
+   BitArray2D *p2_setup_board = nullptr;  ///< internal representation of a player setup board
 
-   BitArray2D *p1_setup_board = nullptr;
-   BitArray2D *p2_setup_board = nullptr;
+   ConnectionSocket *socket; ///< socket connected to a client
 
    /**
     * Sets up a BitArray2D pointer with bits filled in based on a setup_board_name
@@ -75,24 +75,30 @@ public:
    /**
     * Performs Server initialization
     *
-    * Need to do initialization outside of the constructor, so that the object may be initialized inside the
-    * googletest SetUp() method.
     * The method opens player setup boards containing ship positions and checks the size of boards compared to
     * board_size parameter.
     * @param board_size - the size of a square board
+    * @param socket - socket connect to client
     * @param p1_setup_board - file name of player 1's board
     * @param p2_setup_board - file name of player 2's board
     */
    void initialize(unsigned int board_size,
+                   ConnectionSocket *socket,
                    string p1_setup_board,
                    string p2_setup_board);
+
+   /**
+    * Checks if a shot is available in socket
+    *
+    * @return true if shot is available, false otherwise
+    */
+   bool shot_available();
 
    /**
     * Checks the coordinates of a shot against setup board of player
     *
     * Check that player number within bounds, checks that shot coordinates within bounds, determines if the shot
     * results in a HIT, or a MISS.
-    * @param player - player number
     * @param x - coordinate
     * @param y - coordinate
     * @return returns shot result as either HIT, MISS, or OUT_OF_BOUNDS
@@ -103,11 +109,11 @@ public:
     * Processes a shot issued by player
     *
     * Gets the shot from player, extracts coordinates, passes the information of evaluate_shot, and writes the result
-    * into player_#.result.json.
-    * @param player - player number
-    * @return returns SHOT_PROCESSED, or NO_SHOT_FILE if nothing to process
+    * into the internal player board representation.
+    * Player number comes from the fire message sent by the client.
+    * @param player_sem - an array of two semaphores that controls if this, or the other player number should have their shot processed
     */
-   int process_shot(unsigned int player);
+   void process_shot(sem_t *player_sem);
 
    /**
     * Deallocates Server memory

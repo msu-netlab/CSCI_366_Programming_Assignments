@@ -18,6 +18,8 @@
 #include "common.hpp"
 #include "Server.hpp"
 
+#include <cstdio>
+#include <cstring>
 
 /**
  * Calculate the length of a file (helper function)
@@ -30,6 +32,7 @@ int get_file_length(ifstream *file){
 
 
 void Server::initialize(unsigned int board_size,
+                        ConnectionSocket *socket,
                         string p1_setup_board,
                         string p2_setup_board){
 }
@@ -46,6 +49,10 @@ int Server::evaluate_shot(unsigned int player, unsigned int x, unsigned int y) {
 }
 
 
-int Server::process_shot(unsigned int player) {
-   return NO_SHOT_FILE;
+bool Server::shot_available(){
+   return socket->data_available();
+}
+void Server::process_shot(sem_t *player_sem) {
+
+
 }

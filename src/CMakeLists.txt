@@ -10,10 +10,27 @@ include_directories(${PROJECT_SOURCE_DIR}/cereal/include)
 
 set_source_files_properties(BitArray2D.asm PROPERTIES COMPILE_FLAGS "-g -Fdwarf")
 
-add_library(SERVER Server.cpp Server.hpp BitArray2D.cpp BitArray2D.hpp BitArray2D.asm)
+add_library(SERVER
+        Server.cpp
+        BitArray2D.cpp
+        BitArray2D.asm
+        Socket.cpp)
 
-add_library(CLIENT Client.cpp Client.hpp)
+add_library(CLIENT
+        Client.cpp
+        Socket.cpp)
 
-add_executable(run_server server_main.cpp Server.cpp BitArray2D.cpp BitArray2D.hpp BitArray2D.asm)
+SET(CMAKE_CXX_FLAGS -pthread)
+add_executable(run_server
+        server_main.cpp
+        Server.cpp
+        BitArray2D.cpp
+        BitArray2D.asm
+        Socket.cpp)
 
-add_executable(run_client client_main.cpp Client.cpp BitArray2D.cpp BitArray2D.hpp BitArray2D.asm)
+add_executable(run_client
+        client_main.cpp
+        Client.cpp
+        BitArray2D.cpp
+        BitArray2D.asm
+        Socket.cpp)

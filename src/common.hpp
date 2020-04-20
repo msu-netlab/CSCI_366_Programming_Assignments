@@ -24,4 +24,6 @@
 
 #define BOARD_SIZE 10
 
+#define SERVER_PORT 8080
+
 #endif //BATTLESHIP_COMMON_H

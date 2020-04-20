@@ -16,29 +16,63 @@
 
 #include "common.hpp"
 #include "Server.hpp"
+#include "Socket.hpp"
 
-#include <chrono>
 #include <thread>
+#include <string>
+#include <semaphore.h>
+
+
+
+// set up a global boolean variable to stop the threads
+bool stop_threads = false;
+// set up global semaphores to let server threads alternate between players when processing shots
+sem_t player_sem[2];
+
+/**
+ * Create a server object that processes player shots
+ * Threads take turns based on player_sem passed int process shot
+ * @param sock - a socket connected to a player
+ */
+void run_server(ConnectionSocket *socket){
+   Server s;
+   s.initialize(BOARD_SIZE, socket, "player_1.setup_board.txt", "player_2.setup_board.txt");
+
+   // run the loop until stop_threads is switched to true
+   while(!stop_threads){
+      if(s.shot_available())
+         s.process_shot(player_sem);
+   }
+
+   //disconnect the socket
+   delete socket;
+   socket = nullptr;
+}
 
 
 int main(){
-    cout << "Starting Battleship server" << endl;
+   cout << "Battleship server" << endl;
 
-    Server s;
-    s.initialize(BOARD_SIZE, "player_1.setup_board.txt", "player_2.setup_board.txt");
+   // set up the semaphores, such that player 1 gets to start first
+   sem_init(&player_sem[0], 0, 1);
+   sem_init(&player_sem[1], 0, 0);
 
-    // run the server process in a loop
-    while(true){
-        while(s.process_shot(1) == NO_SHOT_FILE) {
-            cout << "Waiting for shot from player 1" << endl;
-            this_thread::sleep_for(std::chrono::milliseconds(2000));
-        }
-        cout << "Processed shot from player 1" << endl;
-        while(s.process_shot(2) == NO_SHOT_FILE) {
-            cout << "Waiting for shot from player 2" << endl;
-            this_thread::sleep_for(std::chrono::milliseconds(2000));
-        }
-        cout << "Processed shot from player 2" << endl;
-    }
+   // open a server socket
+   ServerSocket server_socket(SERVER_PORT, 2);
 
+   // connect with players and start server threads
+   std::thread server_threads[2];
+   for(int i=0; i<2; i++){
+      ConnectionSocket *connection_socket = server_socket.accept();
+      server_threads[i] = std::thread(run_server, connection_socket);
+   }
+
+   cout << "Press enter to stop server threads" << endl;
+   cin.get(); // will wait until enter
+
+   // stop the threads and wait for them to join
+   stop_threads = true;
+   for(int i=0; i<2; i++)
+      server_threads[i].join();
+   cout << "Server threads joined. Exiting." << endl;
 }
